@@ -1,0 +1,2594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机关食堂菜单管理系统</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .meal-type {
+            background-color: #e6f7ff;
+            font-weight: bold;
+        }
+        .category {
+            background-color: #f0f0f0;
+        }
+        button {
+            display: inline-block;
+            margin: 10px;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button.delete {
+            background-color: #f44336;
+        }
+        button.delete:hover {
+            background-color: #d32f2f;
+        }
+        button.secondary {
+            background-color: #2196F3;
+        }
+        button.secondary:hover {
+            background-color: #0b7dda;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .dish-list {
+            margin-top: 15px;
+        }
+        .dish-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .dish-item:hover {
+            background-color: #f0f0f0;
+        }
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #f1f1f1;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 0 5px 5px 5px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .date-info {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #666;
+            font-style: italic;
+        }
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #f5c6cb;
+            background-color: #f8d7da;
+            color: #721c24;
+            border-radius: 4px;
+            display: none;
+        }
+        .file-input {
+            display: none;
+        }
+        .csv-import-section {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px dashed #ccc;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+        }
+        .attendance-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .attendance-day {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .attendance-day h4 {
+            margin-top: 0;
+            text-align: center;
+        }
+        .shopping-list {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .ingredient-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .ingredient-header {
+            font-weight: bold;
+            background-color: #e6f7ff;
+        }
+        .ingredient-category {
+            font-weight: bold;
+            background-color: #f0f0f0;
+            margin-top: 10px;
+            padding: 5px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 5px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: black;
+        }
+        .ingredient-form {
+            margin-top: 15px;
+        }
+        .ingredient-form input {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .day-selector {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        .editable-dish {
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .editable-dish:hover {
+            background-color: #e6f7ff;
+        }
+        .dish-edit-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .dish-edit-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            max-width: 500px;
+            border-radius: 5px;
+        }
+        .data-export-section {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+            float: right;
+            width: 30%;
+            margin-left: 20px;
+        }
+        .shopping-content {
+            display: flex;
+        }
+        .shopping-main {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>机关食堂菜单管理系统</h1>
+        
+        <div class="tab-container">
+            <div class="tab active" onclick="openTab('menu-tab')">菜单生成</div>
+            <div class="tab" onclick="openTab('database-tab')">菜品管理</div>
+            <div class="tab" onclick="openTab('ingredient-tab')">食材管理</div>
+            <div class="tab" onclick="openTab('shopping-tab')">采购清单</div>
+        </div>
+        
+        <!-- 菜单生成标签页 -->
+        <div id="menu-tab" class="tab-content active">
+            <div class="section">
+                <h2>下周菜单生成</h2>
+                <div id="date-info" class="date-info"></div>
+                <button onclick="generateMenu()">一键生成下周菜单</button>
+                <button class="secondary" onclick="saveMenu()">保存菜单</button>
+                <button class="secondary" onclick="printMenu()">打印菜单</button>
+                <button class="secondary" onclick="exportMenuToCSV()">导出菜单CSV</button>
+                <div id="menu-container"></div>
+            </div>
+        </div>
+        
+        <!-- 菜品管理标签页 -->
+        <div id="database-tab" class="tab-content">
+            <div class="section">
+                <h2>菜品数据库管理</h2>
+                <div id="duplicate-alert" class="alert">该菜品已存在，请勿重复添加！</div>
+                
+                <div class="form-group">
+                    <label for="category">餐别:</label>
+                    <select id="category" onchange="updateSubCategoryOptions()">
+                        <option value="breakfast">早餐</option>
+                        <option value="lunch">午餐</option>
+                        <option value="dinner">晚餐</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="subCategory">菜品类型:</label>
+                    <select id="subCategory" onchange="showDishList()">
+                        <!-- 动态填充 -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="newDish">新增菜品:</label>
+                    <input type="text" id="newDish" placeholder="输入新菜品名称">
+                </div>
+                
+                <button onclick="addDish()">添加菜品</button>
+                <button class="secondary" onclick="exportToCSV()">导出菜品CSV</button>
+                <button class="secondary" onclick="document.getElementById('csvFileInput').click()">导入菜品CSV</button>
+                <input type="file" id="csvFileInput" class="file-input" accept=".csv" onchange="importFromCSV(event)">
+                
+                <div class="csv-import-section">
+                    <h3>CSV导入说明</h3>
+                    <p>CSV文件格式应为：餐别,菜品类型,[食材类别],菜品名称</p>
+                    <p>示例：</p>
+                    <pre>早餐,主食,,南瓜粥
+午餐,主荤,鸡肉类,宫保鸡丁
+晚餐,素菜,,炒西兰花</pre>
+                </div>
+                
+                <h3>当前菜品列表</h3>
+                <div id="current-category"></div>
+                <div id="dish-list" class="dish-list"></div>
+            </div>
+        </div>
+        
+        <!-- 食材管理标签页 -->
+        <div id="ingredient-tab" class="tab-content">
+            <div class="section">
+                <h2>食材配方管理</h2>
+                <div id="ingredient-alert" class="alert"></div>
+                
+                <div class="form-group">
+                    <label for="ingredient-category">餐别:</label>
+                    <select id="ingredient-category" onchange="updateIngredientSubCategoryOptions()">
+                        <option value="breakfast">早餐</option>
+                        <option value="lunch">午餐</option>
+                        <option value="dinner">晚餐</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ingredient-subCategory">菜品类型:</label>
+                    <select id="ingredient-subCategory" onchange="updateIngredientDishOptions()">
+                        <!-- 动态填充 -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ingredient-dish">选择菜品:</label>
+                    <select id="ingredient-dish" onchange="showIngredientList()">
+                        <!-- 动态填充 -->
+                    </select>
+                </div>
+                
+                <button onclick="showAddIngredientModal()">添加/编辑食材配方</button>
+                <button class="secondary" onclick="exportIngredientsToCSV()">导出食材配方CSV</button>
+                <button class="secondary" onclick="document.getElementById('ingredientCsvFileInput').click()">导入食材配方CSV</button>
+                <input type="file" id="ingredientCsvFileInput" class="file-input" accept=".csv" onchange="importIngredientsFromCSV(event)">
+                
+                <div class="csv-import-section">
+                    <h3>CSV导入说明</h3>
+                    <p>CSV文件格式应为：餐别,菜品类型,菜品名称,食材名称,用量,单位</p>
+                    <p>示例：</p>
+                    <pre>早餐,主食,南瓜粥,南瓜,0.1,kg
+早餐,主食,南瓜粥,大米,0.05,kg
+早餐,主食,南瓜粥,水,0.5,L
+午餐,主荤,宫保鸡丁,鸡胸肉,0.15,kg
+午餐,主荤,宫保鸡丁,花生,0.03,kg</pre>
+                </div>
+                
+                <h3>当前食材配方</h3>
+                <div id="current-ingredient-dish"></div>
+                <div id="ingredient-list" class="dish-list"></div>
+            </div>
+        </div>
+        
+        <!-- 采购清单标签页 -->
+        <div id="shopping-tab" class="tab-content">
+            <div class="section">
+                <h2>食材采购清单</h2>
+                
+                <h3>就餐人数设置</h3>
+                <div class="attendance-input">
+                    <div class="attendance-day">
+                        <h4>星期一</h4>
+                        <label>早餐人数: <input type="number" id="monday-breakfast" min="0" value="100"></label><br>
+                        <label>午餐人数: <input type="number" id="monday-lunch" min="0" value="100"></label><br>
+                        <label>晚餐人数: <input type="number" id="monday-dinner" min="0" value="100"></label>
+                    </div>
+                    <div class="attendance-day">
+                        <h4>星期二</h4>
+                        <label>早餐人数: <input type="number" id="tuesday-breakfast" min="0" value="100"></label><br>
+                        <label>午餐人数: <input type="number" id="tuesday-lunch" min="0" value="100"></label><br>
+                        <label>晚餐人数: <input type="number" id="tuesday-dinner" min="0" value="100"></label>
+                    </div>
+                    <div class="attendance-day">
+                        <h4>星期三</h4>
+                        <label>早餐人数: <input type="number" id="wednesday-breakfast" min="0" value="100"></label><br>
+                        <label>午餐人数: <input type="number" id="wednesday-lunch" min="0" value="100"></label><br>
+                        <label>晚餐人数: <input type="number" id="wednesday-dinner" min="0" value="100"></label>
+                    </div>
+                    <div class="attendance-day">
+                        <h4>星期四</h4>
+                        <label>早餐人数: <input type="number" id="thursday-breakfast" min="0" value="100"></label><br>
+                        <label>午餐人数: <input type="number" id="thursday-lunch" min="0" value="100"></label><br>
+                        <label>晚餐人数: <input type="number" id="thursday-dinner" min="0" value="100"></label>
+                    </div>
+                    <div class="attendance-day">
+                        <h4>星期五</h4>
+                        <label>早餐人数: <input type="number" id="friday-breakfast" min="0" value="100"></label><br>
+                        <label>午餐人数: <input type="number" id="friday-lunch" min="0" value="100"></label><br>
+                        <label>晚餐人数: <input type="number" id="friday-dinner" min="0" value="100"></label>
+                    </div>
+                    <div class="attendance-day">
+                        <h4>星期六</h4>
+                        <label>早餐人数: <input type="number" id="saturday-breakfast" min="0" value="100"></label><br>
+                        <label>午餐人数: <input type="number" id="saturday-lunch" min="0" value="100"></label><br>
+                        <label>晚餐人数: <input type="number" id="saturday-dinner" min="0" value="100"></label>
+                    </div>
+                    <div class="attendance-day">
+                        <h4>星期日</h4>
+                        <label>早餐人数: <input type="number" id="sunday-breakfast" min="0" value="100"></label><br>
+                        <label>午餐人数: <input type="number" id="sunday-lunch" min="0" value="100"></label><br>
+                        <label>晚餐人数: <input type="number" id="sunday-dinner" min="0" value="100"></label>
+                    </div>
+                </div>
+                
+                <div class="day-selector">
+                    <label for="calculate-day">选择要计算的日期:</label>
+                    <select id="calculate-day">
+                        <option value="monday">星期一</option>
+                        <option value="tuesday">星期二</option>
+                        <option value="wednesday">星期三</option>
+                        <option value="thursday">星期四</option>
+                        <option value="friday">星期五</option>
+                        <option value="saturday">星期六</option>
+                        <option value="sunday">星期日</option>
+                        <option value="week">整周</option>
+                    </select>
+                </div>
+                
+                <button onclick="calculateIngredients()">计算食材需求</button>
+                <button class="secondary" onclick="printShoppingList()">打印采购清单</button>
+                <button class="secondary" onclick="exportShoppingListToCSV()">导出采购清单CSV</button>
+                <button class="secondary" onclick="document.getElementById('dataBackupModal').style.display='block'">数据备份与恢复</button>
+                
+                <div class="shopping-content">
+                    <div class="shopping-main">
+                        <div id="shopping-list" class="shopping-list">
+                            <p>请先生成菜单并计算食材需求</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 数据备份与恢复模态框 -->
+    <div id="dataBackupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('dataBackupModal').style.display='none'">&times;</span>
+            <h2>数据备份与恢复</h2>
+            <p>导出或导入所有系统数据（菜单、菜品、食材配方、就餐人数）</p>
+            <button onclick="exportAllData()">导出所有数据</button>
+            <button class="secondary" onclick="document.getElementById('allDataFileInput').click()">导入所有数据</button>
+            <input type="file" id="allDataFileInput" class="file-input" accept=".json" onchange="importAllData(event)">
+            <p>注意：导入数据将覆盖当前所有数据，请谨慎操作。</p>
+        </div>
+    </div>
+    
+    <!-- 添加食材配方模态框 -->
+    <div id="ingredient-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeIngredientModal()">&times;</span>
+            <h3 id="modal-title">添加食材配方</h3>
+            <div id="ingredient-form" class="ingredient-form">
+                <!-- 动态填充 -->
+            </div>
+            <button onclick="saveIngredients()">保存配方</button>
+        </div>
+    </div>
+
+    <!-- 编辑菜品模态框 -->
+    <div id="dish-edit-modal" class="dish-edit-modal">
+        <div class="dish-edit-content">
+            <span class="close" onclick="closeDishEditModal()">&times;</span>
+            <h3>编辑菜品</h3>
+            <div class="form-group">
+                <label for="edit-meal-type">餐别:</label>
+                <select id="edit-meal-type" disabled>
+                    <option value="breakfast">早餐</option>
+                    <option value="lunch">午餐</option>
+                    <option value="dinner">晚餐</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="edit-dish-type">菜品类型:</label>
+                <select id="edit-dish-type" disabled>
+                    <!-- 动态填充 -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="edit-day">日期:</label>
+                <select id="edit-day" disabled>
+                    <option value="0">星期一</option>
+                    <option value="1">星期二</option>
+                    <option value="2">星期三</option>
+                    <option value="3">星期四</option>
+                    <option value="4">星期五</option>
+                    <option value="5">星期六</option>
+                    <option value="6">星期日</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="edit-dish-name">菜品名称:</label>
+                <select id="edit-dish-name">
+                    <!-- 动态填充 -->
+                </select>
+            </div>
+            <button onclick="saveDishEdit()">保存修改</button>
+        </div>
+    </div>
+
+    <script>
+        // 菜品数据库（按食材类别分组）
+        let dishDatabase = {
+            breakfast: {
+                staple: ["南瓜粥", "小米粥", "八宝粥", "皮蛋瘦肉粥", "燕麦粥", "玉米粥", "红薯粥", "青菜粥", "南瓜小米粥", "红豆薏米粥"],
+                drink: ["牛奶", "芝麻糊", "豆奶", "杏仁茶", "红枣茶", "玉米汁", "花生奶", "椰奶", "燕麦奶", "黑芝麻糊"],
+                egg: ["煎蛋", "卤蛋", "茶叶蛋", "水煮蛋", "咸蛋", "蒸蛋", "荷包蛋", "蛋饼", "溏心蛋", "五香蛋"],
+                dimsum: ["奶黄包", "豆沙包", "紫薯馒头", "肉松包", "玉米馒头", "烧卖", "花卷", "奶香馒头", "叉烧包", "红糖馒头"],
+                dimsum2: ["小笼包", "蒸饺", "春卷", "糯米鸡", "蛋挞", "发糕", "麻团", "油条", "煎饼", "韭菜盒子"],
+                pickle: ["凉拌黄瓜", "酱香茄子", "凉拌木耳", "酸辣白菜", "凉拌海带丝", "腌萝卜", "辣白菜", "腌黄瓜", "酱豆腐", "泡菜"],
+                pickle2: ["咸菜丝", "豆腐乳", "酱萝卜", "腌辣椒", "酱黄豆", "腌雪菜", "酱花生", "腌蒜头", "酱黄瓜", "腌芥菜"],
+                grain: ["紫薯", "南瓜", "甜玉米", "芋头", "山药", "红薯", "土豆", "栗子", "菱角", "花生"]
+            },
+            lunch: {
+                mainMeat: {
+                    chicken: ["宫保鸡丁", "白斩鸡", "辣子鸡", "口水鸡", "三杯鸡"],
+                    duck: ["姜母鸭", "咸水鸭", "酱鸭", "啤酒鸭", "八宝鸭"],
+                    pork: ["红烧肉", "糖醋排骨", "回锅肉", "梅菜扣肉", "粉蒸肉"],
+                    beef: ["水煮牛肉", "黑椒牛柳", "番茄牛腩", "葱爆牛肉", "土豆烧牛肉"],
+                    fish: ["清蒸鲈鱼", "红烧鱼块", "水煮鱼", "酸菜鱼", "糖醋鱼"]
+                },
+                secondaryMeat: ["鱼香肉丝", "青椒炒肉", "番茄炒蛋", "蒜苔炒肉", "鱼香茄子", "地三鲜", "干煸豆角", "蚂蚁上树", "红烧豆腐",
+                              "干锅土豆片", "青椒炒蛋", "木须肉", "京酱肉丝", "肉末茄子", "炒猪肝", "芹菜炒肉", "莴笋炒肉", "西葫芦炒肉", "韭黄炒蛋"],
+                noodle: ["炸酱面", "凉面", "牛肉面", "炒河粉", "酸辣汤面", "素炒面", "炒米粉", "担担面", "热干面", "臊子面"],
+                vegetable: ["炒西兰花", "蒜蓉空心菜", "清炒油麦菜", "炒菠菜", "清炒茼蒿", "炒丝瓜", "炒豆角", "炒白菜", "炒莴笋", "炒藕片"],
+                staple: ["白米饭", "糙米饭", "小米饭", "红豆饭", "黑米饭", "糯米饭", "玉米饭", "红薯饭"],
+                soup: ["番茄蛋汤", "冬瓜排骨汤", "菌菇汤", "紫菜虾皮汤", "萝卜牛肉汤", "玉米排骨汤", "海带排骨汤", "豆腐鱼头汤", "酸辣汤", "青菜豆腐汤"],
+                fruit: ["苹果", "梨", "橙子", "香蕉", "西瓜", "哈密瓜", "葡萄", "桃子", "猕猴桃", "火龙果"]
+            },
+            dinner: {
+                mainMeat: {
+                    chicken: ["黄焖鸡", "大盘鸡", "椒麻鸡", "香酥鸡", "葱油鸡"],
+                    duck: ["樟茶鸭子", "卤鸭", "魔芋烧鸭", "茶树菇老鸭汤", "酱爆鸭"],
+                    pork: ["东坡肉", "蒜泥白肉", "红烧狮子头", "蚂蚁上树", "鱼香肉丝"],
+                    beef: ["小炒黄牛肉", "干煸牛肉丝", "萝卜牛腩", "咖喱牛肉", "杭椒牛柳"],
+                    fish: ["剁椒鱼头", "干烧鱼", "红烧带鱼", "香煎小黄鱼", "豆豉蒸鱼"]
+                },
+                secondaryMeat: ["青椒炒肉", "鱼香肉丝", "宫保鸡丁", "蒜苔炒肉", "番茄炒蛋", "鱼香茄子", "地三鲜", "干煸豆角", "蚂蚁上树", "红烧豆腐",
+                               "干锅花菜", "青椒炒蛋", "木须肉", "京酱肉丝", "肉末茄子", "炒猪肝", "芹菜炒肉", "莴笋炒肉", "西葫芦炒肉", "韭黄炒蛋"],
+                vegetable: ["清炒菠菜", "蒜蓉空心菜", "炒西兰花", "清炒油麦菜", "蒜蓉生菜", "清炒小白菜", "炒茼蒿", "清炒菜心", "炒豆苗", "清炒芥蓝"],
+                sideDish: ["炒饭", "炒米粉", "炒面", "炒河粉", "水饺", "馄饨", "煎饺", "包子", "馒头", "花卷"],
+                staple: ["白米饭", "糙米饭", "小米饭", "红豆饭", "黑米饭", "糯米饭", "玉米饭", "红薯饭"],
+                soup: ["番茄蛋汤", "冬瓜排骨汤", "菌菇汤", "紫菜虾皮汤", "萝卜牛肉汤", "玉米排骨汤", "海带排骨汤", "豆腐鱼头汤", "酸辣汤", "青菜豆腐汤"]
+            }
+        };
+
+        // 食材配方数据库
+        let ingredientDatabase = {
+            // 示例数据
+            "breakfast": {
+                "staple": {
+                    "南瓜粥": [
+                        { name: "南瓜", amount: 0.1, unit: "kg" },
+                        { name: "大米", amount: 0.05, unit: "kg" },
+                        { name: "水", amount: 0.5, unit: "L" }
+                    ],
+                    "小米粥": [
+                        { name: "小米", amount: 0.08, unit: "kg" },
+                        { name: "水", amount: 0.5, unit: "L" }
+                    ]
+                },
+                "drink": {
+                    "牛奶": [
+                        { name: "牛奶", amount: 0.25, unit: "L" }
+                    ]
+                }
+            },
+            "lunch": {
+                "mainMeat": {
+                    "宫保鸡丁": [
+                        { name: "鸡胸肉", amount: 0.15, unit: "kg" },
+                        { name: "花生", amount: 0.03, unit: "kg" },
+                        { name: "青椒", amount: 0.05, unit: "kg" },
+                        { name: "干辣椒", amount: 0.01, unit: "kg" }
+                    ]
+                }
+            }
+        };
+
+        // 子类别映射
+        const subCategories = {
+            breakfast: {
+                staple: "主食",
+                drink: "热饮",
+                egg: "蛋类",
+                dimsum: "点心1",
+                dimsum2: "点心2",
+                pickle: "素菜",
+                pickle2: "小菜",
+                grain: "杂粮"
+            },
+            lunch: {
+                mainMeat: "主荤",
+                secondaryMeat: "次荤",
+                noodle: "面食",
+                vegetable: "素菜",
+                staple: "主食",
+                soup: "汤类",
+                fruit: "水果"
+            },
+            dinner: {
+                mainMeat: "主荤",
+                secondaryMeat: "次荤",
+                vegetable: "素菜",
+                sideDish: "副食",
+                staple: "主食",
+                soup: "汤类"
+            }
+        };
+
+        // 食材类别映射
+        const ingredientCategories = {
+            chicken: "鸡肉类",
+            duck: "鸭肉类",
+            pork: "猪肉类",
+            beef: "牛肉类",
+            fish: "鱼类"
+        };
+
+        // 食材单位列表
+        const ingredientUnits = ["kg", "g", "L", "ml", "个", "把", "包", "瓶", "盒", "袋"];
+
+        // 已使用的菜品记录
+        let usedDishes = new Set();
+        // 记录最近使用的食材类别
+        let recentlyUsedIngredients = [];
+        // 当前生成的菜单数据
+        let currentMenuData = null;
+        // 当前计算的采购清单
+        let currentShoppingList = null;
+        // 当前选择的日期
+        let currentSelectedDay = "week";
+
+        // 餐别英文到中文的映射
+        const mealTypeMap = {
+            breakfast: "早餐",
+            lunch: "午餐",
+            dinner: "晚餐"
+        };
+
+        // 菜品类型英文到中文的映射
+        const dishTypeMap = {
+            staple: "主食",
+            drink: "热饮",
+            egg: "蛋类",
+            dimsum: "点心1",
+            dimsum2: "点心2",
+            pickle: "素菜",
+            pickle2: "小菜",
+            grain: "杂粮",
+            mainMeat: "主荤",
+            secondaryMeat: "次荤",
+            noodle: "面食",
+            vegetable: "素菜",
+            soup: "汤类",
+            fruit: "水果",
+            sideDish: "副食"
+        };
+
+        // 当前编辑的菜品信息
+        let currentEditingDish = {
+            mealType: "",
+            dishType: "",
+            dayIndex: 0
+        };
+
+        // 初始化页面
+        window.onload = function() {
+            loadDatabase();
+            updateSubCategoryOptions();
+            showDishList();
+            updateDateInfo();
+            
+            // 初始化食材管理标签页
+            updateIngredientSubCategoryOptions();
+            updateIngredientDishOptions();
+            
+            // 尝试加载保存的数据
+            const savedMenuData = localStorage.getItem('savedMenuData');
+            if (savedMenuData) {
+                currentMenuData = JSON.parse(savedMenuData);
+                renderMenu();
+            } else {
+                generateMenu();
+            }
+            
+            const savedIngredientData = localStorage.getItem('ingredientDatabase');
+            if (savedIngredientData) {
+                ingredientDatabase = JSON.parse(savedIngredientData);
+            }
+            
+            const savedAttendanceData = localStorage.getItem('attendanceData');
+            if (savedAttendanceData) {
+                const attendanceData = JSON.parse(savedAttendanceData);
+                for (const day in attendanceData) {
+                    for (const meal in attendanceData[day]) {
+                        const element = document.getElementById(`${day}-${meal}`);
+                        if (element) {
+                            element.value = attendanceData[day][meal];
+                        }
+                    }
+                }
+            }
+        };
+
+        // 更新日期信息显示
+        function updateDateInfo() {
+            const dates = getNextWeekDates();
+            const dateInfo = `下周菜单日期: ${dates[0]} 至 ${dates[6]}`;
+            document.getElementById('date-info').textContent = dateInfo;
+        }
+
+        // 切换标签页
+        function openTab(tabId) {
+            // 隐藏所有标签内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 取消所有标签的活动状态
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的标签内容
+            document.getElementById(tabId).classList.add('active');
+            
+            // 设置选中标签的活动状态
+            event.currentTarget.classList.add('active');
+        }
+
+        // 更新子类别选项
+        function updateSubCategoryOptions() {
+            const category = document.getElementById('category').value;
+            const subCategorySelect = document.getElementById('subCategory');
+            
+            // 清空现有选项
+            subCategorySelect.innerHTML = '';
+            
+            // 添加新选项
+            for (const [key, value] of Object.entries(subCategories[category])) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = value;
+                subCategorySelect.appendChild(option);
+            }
+            
+            // 更新显示的当前类别
+            document.getElementById('current-category').textContent = 
+                `当前类别: ${document.getElementById('category').options[document.getElementById('category').selectedIndex].text} - ${subCategorySelect.options[subCategorySelect.selectedIndex].text}`;
+            
+            // 更新菜品列表
+            showDishList();
+        }
+
+        // 更新食材管理子类别选项
+        function updateIngredientSubCategoryOptions() {
+            const category = document.getElementById('ingredient-category').value;
+            const subCategorySelect = document.getElementById('ingredient-subCategory');
+            
+            // 清空现有选项
+            subCategorySelect.innerHTML = '';
+            
+            // 添加新选项
+            for (const [key, value] of Object.entries(subCategories[category])) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = value;
+                subCategorySelect.appendChild(option);
+            }
+            
+            // 更新菜品选项
+            updateIngredientDishOptions();
+        }
+
+        // 更新食材管理菜品选项
+        function updateIngredientDishOptions() {
+            const category = document.getElementById('ingredient-category').value;
+            const subCategory = document.getElementById('ingredient-subCategory').value;
+            const dishSelect = document.getElementById('ingredient-dish');
+            
+            // 清空现有选项
+            dishSelect.innerHTML = '';
+            
+            // 添加新选项
+            if (dishDatabase[category] && dishDatabase[category][subCategory]) {
+                // 处理主荤分类
+                if (subCategory === 'mainMeat' && typeof dishDatabase[category][subCategory] === 'object' && !Array.isArray(dishDatabase[category][subCategory])) {
+                    for (const [ingredient, dishes] of Object.entries(dishDatabase[category][subCategory])) {
+                        dishes.forEach(dish => {
+                            const option = document.createElement('option');
+                            option.value = dish;
+                            option.textContent = dish;
+                            dishSelect.appendChild(option);
+                        });
+                    }
+                } else {
+                    // 处理普通分类
+                    const dishes = Array.isArray(dishDatabase[category][subCategory]) ? 
+                        dishDatabase[category][subCategory] : 
+                        Object.values(dishDatabase[category][subCategory]).flat();
+                    
+                    dishes.forEach(dish => {
+                        const option = document.createElement('option');
+                        option.value = dish;
+                        option.textContent = dish;
+                        dishSelect.appendChild(option);
+                    });
+                }
+            }
+            
+            // 显示当前食材配方
+            showIngredientList();
+        }
+
+        // 显示菜品列表
+        function showDishList() {
+            const category = document.getElementById('category').value;
+            const subCategory = document.getElementById('subCategory').value;
+            const dishList = document.getElementById('dish-list');
+            
+            dishList.innerHTML = '';
+            
+            if (dishDatabase[category] && dishDatabase[category][subCategory]) {
+                // 处理主荤分类（按食材分组）
+                if (subCategory === 'mainMeat' && typeof dishDatabase[category][subCategory] === 'object' && !Array.isArray(dishDatabase[category][subCategory])) {
+                    for (const [ingredient, dishes] of Object.entries(dishDatabase[category][subCategory])) {
+                        const ingredientHeader = document.createElement('div');
+                        ingredientHeader.className = 'dish-item';
+                        ingredientHeader.innerHTML = `<strong>${ingredientCategories[ingredient] || ingredient}</strong>`;
+                        dishList.appendChild(ingredientHeader);
+                        
+                        dishes.forEach(dish => {
+                            const dishItem = document.createElement('div');
+                            dishItem.className = 'dish-item';
+                            dishItem.innerHTML = `
+                                <span>${dish}</span>
+                                <button class="delete" onclick="deleteDish('${category}', '${subCategory}', '${dish}', '${ingredient}')">删除</button>
+                            `;
+                            dishList.appendChild(dishItem);
+                        });
+                    }
+                } else {
+                    // 处理普通分类
+                    const dishes = Array.isArray(dishDatabase[category][subCategory]) ? 
+                        dishDatabase[category][subCategory] : 
+                        Object.values(dishDatabase[category][subCategory]).flat();
+                    
+                    dishes.forEach(dish => {
+                        const dishItem = document.createElement('div');
+                        dishItem.className = 'dish-item';
+                        dishItem.innerHTML = `
+                            <span>${dish}</span>
+                            <button class="delete" onclick="deleteDish('${category}', '${subCategory}', '${dish}')">删除</button>
+                        `;
+                        dishList.appendChild(dishItem);
+                    });
+                }
+            }
+        }
+
+        // 显示食材配方列表
+        function showIngredientList() {
+            const category = document.getElementById('ingredient-category').value;
+            const subCategory = document.getElementById('ingredient-subCategory').value;
+            const dish = document.getElementById('ingredient-dish').value;
+            const ingredientList = document.getElementById('ingredient-list');
+            
+            // 更新当前菜品显示
+            document.getElementById('current-ingredient-dish').textContent = 
+                `当前菜品: ${document.getElementById('ingredient-category').options[document.getElementById('ingredient-category').selectedIndex].text} - 
+                ${document.getElementById('ingredient-subCategory').options[document.getElementById('ingredient-subCategory').selectedIndex].text} - ${dish}`;
+            
+            ingredientList.innerHTML = '';
+            
+            // 检查是否有食材配方
+            if (ingredientDatabase[category] && 
+                ingredientDatabase[category][subCategory] && 
+                ingredientDatabase[category][subCategory][dish]) {
+                
+                const ingredients = ingredientDatabase[category][subCategory][dish];
+                
+                // 添加表头
+                const header = document.createElement('div');
+                header.className = 'ingredient-item ingredient-header';
+                header.innerHTML = `
+                    <span>食材名称</span>
+                    <span>用量</span>
+                    <span>操作</span>
+                `;
+                ingredientList.appendChild(header);
+                
+                // 添加食材项
+                ingredients.forEach((ingredient, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'ingredient-item';
+                    item.innerHTML = `
+                        <span>${ingredient.name}</span>
+                        <span>${ingredient.amount} ${ingredient.unit}</span>
+                        <button class="delete" onclick="deleteIngredient('${category}', '${subCategory}', '${dish}', ${index})">删除</button>
+                    `;
+                    ingredientList.appendChild(item);
+                });
+            } else {
+                ingredientList.innerHTML = '<p>暂无食材配方数据</p>';
+            }
+        }
+
+        // 添加菜品
+        function addDish() {
+            const category = document.getElementById('category').value;
+            const subCategory = document.getElementById('subCategory').value;
+            const newDish = document.getElementById('newDish').value.trim();
+            const alertBox = document.getElementById('duplicate-alert');
+            
+            // 隐藏之前的警告
+            alertBox.style.display = 'none';
+            
+            if (!newDish) {
+                alert('请输入菜品名称');
+                return;
+            }
+            
+            // 检查菜品是否已存在
+            if (subCategory === 'mainMeat') {
+                // 主荤需要选择食材类别
+                const ingredient = prompt(`请选择食材类别:\n${Object.entries(ingredientCategories).map(([key, val]) => `${key}: ${val}`).join('\n')}`);
+                if (!ingredient || !ingredientCategories[ingredient]) {
+                    alert('请选择有效的食材类别');
+                    return;
+                }
+                
+                // 初始化数据结构
+                if (!dishDatabase[category][subCategory]) {
+                    dishDatabase[category][subCategory] = {};
+                }
+                if (!dishDatabase[category][subCategory][ingredient]) {
+                    dishDatabase[category][subCategory][ingredient] = [];
+                }
+                
+                // 检查是否已存在
+                if (dishDatabase[category][subCategory][ingredient].includes(newDish)) {
+                    alertBox.style.display = 'block';
+                    return;
+                }
+                
+                dishDatabase[category][subCategory][ingredient].push(newDish);
+            } else {
+                // 普通菜品
+                if (!dishDatabase[category][subCategory]) {
+                    dishDatabase[category][subCategory] = [];
+                }
+                
+                // 检查是否已存在（扁平化检查）
+                const allDishes = Array.isArray(dishDatabase[category][subCategory]) ? 
+                    dishDatabase[category][subCategory] : 
+                    Object.values(dishDatabase[category][subCategory]).flat();
+                
+                if (allDishes.includes(newDish)) {
+                    alertBox.style.display = 'block';
+                    return;
+                }
+                
+                dishDatabase[category][subCategory].push(newDish);
+            }
+            
+            document.getElementById('newDish').value = '';
+            showDishList();
+            saveDatabase();
+            alert('菜品添加成功');
+            
+            // 更新食材管理标签页的菜品选项
+            updateIngredientDishOptions();
+        }
+
+        // 删除菜品
+        function deleteDish(category, subCategory, dish, ingredient) {
+            if (confirm(`确定要删除菜品 "${dish}" 吗？`)) {
+                if (subCategory === 'mainMeat' && ingredient) {
+                    // 主荤菜品按食材分类删除
+                    dishDatabase[category][subCategory][ingredient] = 
+                        dishDatabase[category][subCategory][ingredient].filter(d => d !== dish);
+                    
+                    // 如果该食材类别没有菜品了，删除整个类别
+                    if (dishDatabase[category][subCategory][ingredient].length === 0) {
+                        delete dishDatabase[category][subCategory][ingredient];
+                    }
+                } else {
+                    // 普通菜品删除
+                    if (Array.isArray(dishDatabase[category][subCategory])) {
+                        dishDatabase[category][subCategory] = dishDatabase[category][subCategory].filter(d => d !== dish);
+                    } else {
+                        // 处理可能的主荤数据结构
+                        for (const ing in dishDatabase[category][subCategory]) {
+                            dishDatabase[category][subCategory][ing] = 
+                                dishDatabase[category][subCategory][ing].filter(d => d !== dish);
+                        }
+                    }
+                }
+                
+                showDishList();
+                saveDatabase();
+                
+                // 更新食材管理标签页的菜品选项
+                updateIngredientDishOptions();
+            }
+        }
+
+        // 显示添加食材配方模态框
+        function showAddIngredientModal() {
+            const category = document.getElementById('ingredient-category').value;
+            const subCategory = document.getElementById('ingredient-subCategory').value;
+            const dish = document.getElementById('ingredient-dish').value;
+            
+            if (!dish) {
+                alert('请先选择菜品');
+                return;
+            }
+            
+            // 设置模态框标题
+            document.getElementById('modal-title').textContent = `编辑食材配方: ${dish}`;
+            
+            // 获取现有食材配方
+            const existingIngredients = (ingredientDatabase[category] && 
+                                       ingredientDatabase[category][subCategory] && 
+                                       ingredientDatabase[category][subCategory][dish]) || [];
+            
+            // 构建表单
+            const form = document.getElementById('ingredient-form');
+            form.innerHTML = '';
+            
+            // 添加现有食材
+            existingIngredients.forEach((ingredient, index) => {
+                const ingredientDiv = document.createElement('div');
+                ingredientDiv.className = 'ingredient-form-row';
+                ingredientDiv.innerHTML = `
+                    <input type="text" value="${ingredient.name}" placeholder="食材名称" id="ingredient-name-${index}">
+                    <input type="number" step="0.01" value="${ingredient.amount}" placeholder="用量" id="ingredient-amount-${index}">
+                    <select id="ingredient-unit-${index}">
+                        ${ingredientUnits.map(unit => 
+                            `<option value="${unit}" ${unit === ingredient.unit ? 'selected' : ''}>${unit}</option>`
+                        ).join('')}
+                    </select>
+                    <button class="delete" onclick="this.parentNode.remove()">删除</button>
+                `;
+                form.appendChild(ingredientDiv);
+            });
+            
+            // 添加空白行用于新增食材
+            const addButton = document.createElement('button');
+            addButton.textContent = '添加食材';
+            addButton.onclick = function() {
+                const index = document.querySelectorAll('.ingredient-form-row').length;
+                const ingredientDiv = document.createElement('div');
+                ingredientDiv.className = 'ingredient-form-row';
+                ingredientDiv.innerHTML = `
+                    <input type="text" placeholder="食材名称" id="ingredient-name-${index}">
+                    <input type="number" step="0.01" placeholder="用量" id="ingredient-amount-${index}">
+                    <select id="ingredient-unit-${index}">
+                        ${ingredientUnits.map(unit => 
+                            `<option value="${unit}">${unit}</option>`
+                        ).join('')}
+                    </select>
+                    <button class="delete" onclick="this.parentNode.remove()">删除</button>
+                `;
+                form.insertBefore(ingredientDiv, addButton);
+            };
+            form.appendChild(addButton);
+            
+            // 显示模态框
+            document.getElementById('ingredient-modal').style.display = 'block';
+        }
+
+        // 关闭食材配方模态框
+        function closeIngredientModal() {
+            document.getElementById('ingredient-modal').style.display = 'none';
+        }
+
+        // 保存食材配方
+        function saveIngredients() {
+            const category = document.getElementById('ingredient-category').value;
+            const subCategory = document.getElementById('ingredient-subCategory').value;
+            const dish = document.getElementById('ingredient-dish').value;
+            
+            // 初始化数据结构
+            if (!ingredientDatabase[category]) {
+                ingredientDatabase[category] = {};
+            }
+            if (!ingredientDatabase[category][subCategory]) {
+                ingredientDatabase[category][subCategory] = {};
+            }
+            
+            // 收集食材数据
+            const ingredients = [];
+            const rows = document.querySelectorAll('.ingredient-form-row');
+            
+            rows.forEach((row, index) => {
+                const name = document.getElementById(`ingredient-name-${index}`).value.trim();
+                const amount = parseFloat(document.getElementById(`ingredient-amount-${index}`).value);
+                const unit = document.getElementById(`ingredient-unit-${index}`).value;
+                
+                if (name && !isNaN(amount) && amount > 0) {
+                    ingredients.push({ name, amount, unit });
+                }
+            });
+            
+            // 保存数据
+            ingredientDatabase[category][subCategory][dish] = ingredients;
+            
+            // 保存到本地存储
+            localStorage.setItem('ingredientDatabase', JSON.stringify(ingredientDatabase));
+            
+            // 关闭模态框并刷新显示
+            closeIngredientModal();
+            showIngredientList();
+            
+            alert('食材配方保存成功');
+        }
+
+        // 删除食材配方项
+        function deleteIngredient(category, subCategory, dish, index) {
+            if (confirm('确定要删除这个食材吗？')) {
+                if (ingredientDatabase[category] && 
+                    ingredientDatabase[category][subCategory] && 
+                    ingredientDatabase[category][subCategory][dish]) {
+                    
+                    ingredientDatabase[category][subCategory][dish].splice(index, 1);
+                    
+                    // 如果该菜品没有食材了，删除整个条目
+                    if (ingredientDatabase[category][subCategory][dish].length === 0) {
+                        delete ingredientDatabase[category][subCategory][dish];
+                    }
+                    
+                    // 保存到本地存储
+                    localStorage.setItem('ingredientDatabase', JSON.stringify(ingredientDatabase));
+                    
+                    // 刷新显示
+                    showIngredientList();
+                }
+            }
+        }
+
+        // 导出食材配方为CSV
+        function exportIngredientsToCSV() {
+            let csvContent = "餐别,菜品类型,菜品名称,食材名称,用量,单位\n";
+            
+            // 遍历所有餐别
+            for (const [category, subCats] of Object.entries(ingredientDatabase)) {
+                // 遍历每个餐别的子类别
+                for (const [subCat, dishes] of Object.entries(subCats)) {
+                    // 遍历每个菜品
+                    for (const [dish, ingredients] of Object.entries(dishes)) {
+                        // 遍历每个食材
+                        ingredients.forEach(ingredient => {
+                            csvContent += `${mealTypeMap[category] || category},${dishTypeMap[subCat] || subCat},${dish},${ingredient.name},${ingredient.amount},${ingredient.unit}\n`;
+                        });
+                    }
+                }
+            }
+            
+            // 创建下载链接
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', '食材配方数据库.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 从CSV导入食材配方
+        function importIngredientsFromCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const lines = content.split('\n');
+                let newDatabase = {
+                    breakfast: {},
+                    lunch: {},
+                    dinner: {}
+                };
+                
+                // 跳过标题行
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    
+                    const [category, subCat, dish, name, amount, unit] = line.split(',');
+                    if (!category || !subCat || !dish || !name || !amount || !unit) continue;
+                    
+                    // 将中文餐别和菜品类型转换为英文
+                    const engCategory = getKeyByValue(mealTypeMap, category) || category;
+                    const engSubCat = getKeyByValue(dishTypeMap, subCat) || subCat;
+                    
+                    // 初始化数据结构
+                    if (!newDatabase[engCategory]) {
+                        newDatabase[engCategory] = {};
+                    }
+                    if (!newDatabase[engCategory][engSubCat]) {
+                        newDatabase[engCategory][engSubCat] = {};
+                    }
+                    if (!newDatabase[engCategory][engSubCat][dish]) {
+                        newDatabase[engCategory][engSubCat][dish] = [];
+                    }
+                    
+                    // 添加食材
+                    newDatabase[engCategory][engSubCat][dish].push({
+                        name: name,
+                        amount: parseFloat(amount),
+                        unit: unit
+                    });
+                }
+                
+                // 确认导入
+                if (confirm(`确定要导入 ${lines.length - 1} 条食材配方记录吗？这将覆盖现有数据。`)) {
+                    ingredientDatabase = newDatabase;
+                    
+                    // 保存到本地存储
+                    localStorage.setItem('ingredientDatabase', JSON.stringify(ingredientDatabase));
+                    
+                    // 刷新显示
+                    updateIngredientDishOptions();
+                    showIngredientList();
+                    alert('食材配方导入成功！');
+                }
+            };
+            reader.readAsText(file);
+            
+            // 重置文件输入，允许重复导入同一文件
+            event.target.value = '';
+        }
+
+        // 根据值获取键
+        function getKeyByValue(object, value) {
+            return Object.keys(object).find(key => object[key] === value);
+        }
+
+        // 计算食材需求
+        function calculateIngredients() {
+            if (!currentMenuData) {
+                alert('请先生成菜单');
+                return;
+            }
+            
+            // 获取选择的日期
+            currentSelectedDay = document.getElementById('calculate-day').value;
+            
+            // 获取就餐人数
+            const attendanceData = {
+                monday: {
+                    breakfast: parseInt(document.getElementById('monday-breakfast').value) || 0,
+                    lunch: parseInt(document.getElementById('monday-lunch').value) || 0,
+                    dinner: parseInt(document.getElementById('monday-dinner').value) || 0
+                },
+                tuesday: {
+                    breakfast: parseInt(document.getElementById('tuesday-breakfast').value) || 0,
+                    lunch: parseInt(document.getElementById('tuesday-lunch').value) || 0,
+                    dinner: parseInt(document.getElementById('tuesday-dinner').value) || 0
+                },
+                wednesday: {
+                    breakfast: parseInt(document.getElementById('wednesday-breakfast').value) || 0,
+                    lunch: parseInt(document.getElementById('wednesday-lunch').value) || 0,
+                    dinner: parseInt(document.getElementById('wednesday-dinner').value) || 0
+                },
+                thursday: {
+                    breakfast: parseInt(document.getElementById('thursday-breakfast').value) || 0,
+                    lunch: parseInt(document.getElementById('thursday-lunch').value) || 0,
+                    dinner: parseInt(document.getElementById('thursday-dinner').value) || 0
+                },
+                friday: {
+                    breakfast: parseInt(document.getElementById('friday-breakfast').value) || 0,
+                    lunch: parseInt(document.getElementById('friday-lunch').value) || 0,
+                    dinner: parseInt(document.getElementById('friday-dinner').value) || 0
+                },
+                saturday: {
+                    breakfast: parseInt(document.getElementById('saturday-breakfast').value) || 0,
+                    lunch: parseInt(document.getElementById('saturday-lunch').value) || 0,
+                    dinner: parseInt(document.getElementById('saturday-dinner').value) || 0
+                },
+                sunday: {
+                    breakfast: parseInt(document.getElementById('sunday-breakfast').value) || 0,
+                    lunch: parseInt(document.getElementById('sunday-lunch').value) || 0,
+                    dinner: parseInt(document.getElementById('sunday-dinner').value) || 0
+                }
+            };
+            
+            // 保存就餐人数数据
+            localStorage.setItem('attendanceData', JSON.stringify(attendanceData));
+            
+            // 初始化采购清单
+            const shoppingList = {};
+            
+            if (currentSelectedDay === 'week') {
+                // 计算整周食材需求
+                for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+                    const dayKey = Object.keys(attendanceData)[dayIndex];
+                    calculateDayIngredients(dayKey, attendanceData[dayKey], shoppingList);
+                }
+            } else {
+                // 计算指定日期的食材需求
+                calculateDayIngredients(currentSelectedDay, attendanceData[currentSelectedDay], shoppingList);
+            }
+            
+            // 保存采购清单
+            currentShoppingList = shoppingList;
+            
+            // 显示采购清单
+            renderShoppingList(shoppingList);
+        }
+
+        // 计算指定日期的食材需求
+        function calculateDayIngredients(dayKey, attendance, shoppingList) {
+            // 计算早餐食材需求
+            if (attendance.breakfast > 0) {
+                // 早餐各分类
+                const breakfastCategories = ['staple', 'drink', 'egg', 'dimsum', 'dimsum2', 'pickle', 'pickle2', 'grain'];
+                
+                const dayIndex = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].indexOf(dayKey);
+                
+                breakfastCategories.forEach(category => {
+                    const dish = currentMenuData.breakfast[category][dayIndex];
+                    addDishIngredientsToShoppingList('breakfast', category, dish, attendance.breakfast, shoppingList);
+                });
+            }
+            
+            // 计算午餐食材需求
+            if (attendance.lunch > 0) {
+                const dayIndex = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].indexOf(dayKey);
+                
+                // 午餐各分类
+                const lunchCategories = ['mainMeat1', 'mainMeat2', 'secondaryMeat1', 'secondaryMeat2', 'noodle', 'vegetable', 'staple', 'soup', 'fruit'];
+                
+                lunchCategories.forEach(category => {
+                    let dish = currentMenuData.lunch[category][dayIndex];
+                    let subCategory = category;
+                    
+                    // 处理主荤和次荤的分类
+                    if (category.startsWith('mainMeat')) {
+                        subCategory = 'mainMeat';
+                    } else if (category.startsWith('secondaryMeat')) {
+                        subCategory = 'secondaryMeat';
+                    }
+                    
+                    addDishIngredientsToShoppingList('lunch', subCategory, dish, attendance.lunch, shoppingList);
+                });
+            }
+            
+            // 计算晚餐食材需求
+            if (attendance.dinner > 0) {
+                const dayIndex = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].indexOf(dayKey);
+                
+                // 晚餐各分类
+                const dinnerCategories = ['mainMeat', 'secondaryMeat1', 'secondaryMeat2', 'vegetable', 'sideDish', 'staple', 'soup'];
+                
+                dinnerCategories.forEach(category => {
+                    let dish = currentMenuData.dinner[category][dayIndex];
+                    let subCategory = category;
+                    
+                    // 处理次荤的分类
+                    if (category.startsWith('secondaryMeat')) {
+                        subCategory = 'secondaryMeat';
+                    }
+                    
+                    addDishIngredientsToShoppingList('dinner', subCategory, dish, attendance.dinner, shoppingList);
+                });
+            }
+        }
+
+        // 添加菜品食材到采购清单
+        function addDishIngredientsToShoppingList(category, subCategory, dish, attendance, shoppingList) {
+            if (!ingredientDatabase[category] || 
+                !ingredientDatabase[category][subCategory] || 
+                !ingredientDatabase[category][subCategory][dish]) {
+                return;
+            }
+            
+            const ingredients = ingredientDatabase[category][subCategory][dish];
+            
+            ingredients.forEach(ingredient => {
+                const key = `${ingredient.name} (${ingredient.unit})`;
+                
+                if (!shoppingList[key]) {
+                    shoppingList[key] = {
+                        name: ingredient.name,
+                        amount: 0,
+                        unit: ingredient.unit,
+                        dishes: []
+                    };
+                }
+                
+                // 计算总用量（每人份）
+                shoppingList[key].amount += ingredient.amount * attendance;
+                
+                // 记录使用该食材的菜品
+                if (!shoppingList[key].dishes.includes(dish)) {
+                    shoppingList[key].dishes.push(dish);
+                }
+            });
+        }
+
+        // 渲染采购清单
+        function renderShoppingList(shoppingList) {
+            const shoppingListContainer = document.getElementById('shopping-list');
+            
+            if (Object.keys(shoppingList).length === 0) {
+                shoppingListContainer.innerHTML = '<p>没有需要采购的食材</p>';
+                return;
+            }
+            
+            // 按食材类别分组
+            const categorizedIngredients = {};
+            
+            // 简单分类（实际应用中可以根据食材名称或类型进行更智能的分类）
+            Object.values(shoppingList).forEach(item => {
+                let category = '其他';
+                
+                if (item.name.includes('肉') || item.name.includes('鸡') || item.name.includes('鸭') || 
+                    item.name.includes('鱼') || item.name.includes('牛') || item.name.includes('猪')) {
+                    category = '肉类';
+                } else if (item.name.includes('菜') || item.name.includes('蔬') || item.name.includes('青') || 
+                          item.name.includes('白') || item.name.includes('萝') || item.name.includes('茄')) {
+                    category = '蔬菜类';
+                } else if (item.name.includes('米') || item.name.includes('面') || item.name.includes('粉') || 
+                          item.name.includes('饭') || item.name.includes('馒') || item.name.includes('包')) {
+                    category = '主食类';
+                } else if (item.name.includes('蛋') || item.name.includes('奶') || item.name.includes('豆') || 
+                          item.name.includes('腐') || item.name.includes('酱') || item.name.includes('油')) {
+                    category = '副食类';
+                } else if (item.name.includes('水') || item.name.includes('果') || item.name.includes('瓜') || 
+                          item.name.includes('苹') || item.name.includes('梨') || item.name.includes('橙')) {
+                    category = '水果类';
+                } else if (item.name.includes('调') || item.name.includes('盐') || item.name.includes('糖') || 
+                          item.name.includes('醋') || item.name.includes('酱') || item.name.includes('油')) {
+                    category = '调味品类';
+                }
+                
+                if (!categorizedIngredients[category]) {
+                    categorizedIngredients[category] = [];
+                }
+                
+                categorizedIngredients[category].push(item);
+            });
+            
+            // 构建HTML
+            let html = '';
+            
+            // 添加标题显示当前选择的日期
+            const dayNames = {
+                'monday': '星期一',
+                'tuesday': '星期二',
+                'wednesday': '星期三',
+                'thursday': '星期四',
+                'friday': '星期五',
+                'saturday': '星期六',
+                'sunday': '星期日',
+                'week': '整周'
+            };
+            
+            html += `<h3>${dayNames[currentSelectedDay]}食材需求</h3>`;
+            
+            for (const [category, items] of Object.entries(categorizedIngredients)) {
+                html += `<div class="ingredient-category">${category}</div>`;
+                
+                // 表头
+                html += `
+                    <div class="ingredient-item ingredient-header">
+                        <span>食材名称</span>
+                        <span>总需求量</span>
+                        <span>使用菜品</span>
+                    </div>
+                `;
+                
+                // 食材项
+                items.forEach(item => {
+                    // 格式化数量
+                    let formattedAmount = item.amount;
+                    let formattedUnit = item.unit;
+                    
+                    // 自动转换单位（例如：1000g -> 1kg）
+                    if (item.unit === 'g' && item.amount >= 1000) {
+                        formattedAmount = (item.amount / 1000).toFixed(2);
+                        formattedUnit = 'kg';
+                    } else if (item.unit === 'ml' && item.amount >= 1000) {
+                        formattedAmount = (item.amount / 1000).toFixed(2);
+                        formattedUnit = 'L';
+                    } else {
+                        formattedAmount = item.amount.toFixed(2);
+                    }
+                    
+                    html += `
+                        <div class="ingredient-item">
+                            <span>${item.name}</span>
+                            <span>${formattedAmount} ${formattedUnit}</span>
+                            <span>${item.dishes.join(', ')}</span>
+                        </div>
+                    `;
+                });
+            }
+            
+            shoppingListContainer.innerHTML = html;
+        }
+
+        // 打印采购清单
+        function printShoppingList() {
+            if (!currentShoppingList || Object.keys(currentShoppingList).length === 0) {
+                alert('请先计算食材需求');
+                return;
+            }
+            
+            // 创建一个新窗口用于打印
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>采购清单</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h1 { text-align: center; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; }
+                        .category { font-weight: bold; background-color: #f0f0f0; }
+                    </style>
+                </head>
+                <body>
+                    <h1>机关食堂采购清单</h1>
+                    <p>生成日期: ${new Date().toLocaleDateString()}</p>
+            `);
+            
+            // 添加标题显示当前选择的日期
+            const dayNames = {
+                'monday': '星期一',
+                'tuesday': '星期二',
+                'wednesday': '星期三',
+                'thursday': '星期四',
+                'friday': '星期五',
+                'saturday': '星期六',
+                'sunday': '星期日',
+                'week': '整周'
+            };
+            
+            printWindow.document.write(`<h2>${dayNames[currentSelectedDay]}食材需求</h2>`);
+            
+            // 按食材类别分组（与renderShoppingList相同的逻辑）
+            const categorizedIngredients = {};
+            
+            Object.values(currentShoppingList).forEach(item => {
+                let category = '其他';
+                
+                if (item.name.includes('肉') || item.name.includes('鸡') || item.name.includes('鸭') || 
+                    item.name.includes('鱼') || item.name.includes('牛') || item.name.includes('猪')) {
+                    category = '肉类';
+                } else if (item.name.includes('菜') || item.name.includes('蔬') || item.name.includes('青') || 
+                          item.name.includes('白') || item.name.includes('萝') || item.name.includes('茄')) {
+                    category = '蔬菜类';
+                } else if (item.name.includes('米') || item.name.includes('面') || item.name.includes('粉') || 
+                          item.name.includes('饭') || item.name.includes('馒') || item.name.includes('包')) {
+                    category = '主食类';
+                } else if (item.name.includes('蛋') || item.name.includes('奶') || item.name.includes('豆') || 
+                          item.name.includes('腐') || item.name.includes('酱') || item.name.includes('油')) {
+                    category = '副食类';
+                } else if (item.name.includes('水') || item.name.includes('果') || item.name.includes('瓜') || 
+                          item.name.includes('苹') || item.name.includes('梨') || item.name.includes('橙')) {
+                    category = '水果类';
+                } else if (item.name.includes('调') || item.name.includes('盐') || item.name.includes('糖') || 
+                          item.name.includes('醋') || item.name.includes('酱') || item.name.includes('油')) {
+                    category = '调味品类';
+                }
+                
+                if (!categorizedIngredients[category]) {
+                    categorizedIngredients[category] = [];
+                }
+                
+                categorizedIngredients[category].push(item);
+            });
+            
+            // 添加表格内容
+            for (const [category, items] of Object.entries(categorizedIngredients)) {
+                printWindow.document.write(`
+                    <h3>${category}</h3>
+                    <table>
+                        <tr>
+                            <th>食材名称</th>
+                            <th>总需求量</th>
+                            <th>使用菜品</th>
+                        </tr>
+                `);
+                
+                items.forEach(item => {
+                    // 格式化数量
+                    let formattedAmount = item.amount;
+                    let formattedUnit = item.unit;
+                    
+                    if (item.unit === 'g' && item.amount >= 1000) {
+                        formattedAmount = (item.amount / 1000).toFixed(2);
+                        formattedUnit = 'kg';
+                    } else if (item.unit === 'ml' && item.amount >= 1000) {
+                        formattedAmount = (item.amount / 1000).toFixed(2);
+                        formattedUnit = 'L';
+                    } else {
+                        formattedAmount = item.amount.toFixed(2);
+                    }
+                    
+                    printWindow.document.write(`
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>${formattedAmount} ${formattedUnit}</td>
+                            <td>${item.dishes.join(', ')}</td>
+                        </tr>
+                    `);
+                });
+                
+                printWindow.document.write('</table>');
+            }
+            
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            
+            // 延迟打印以确保内容加载完成
+            setTimeout(() => {
+                printWindow.print();
+            }, 500);
+        }
+
+        // 导出采购清单为CSV
+        function exportShoppingListToCSV() {
+            if (!currentShoppingList || Object.keys(currentShoppingList).length === 0) {
+                alert('请先计算食材需求');
+                return;
+            }
+            
+            let csvContent = "食材类别,食材名称,总需求量,单位,使用菜品\n";
+            
+            // 按食材类别分组（与renderShoppingList相同的逻辑）
+            const categorizedIngredients = {};
+            
+            Object.values(currentShoppingList).forEach(item => {
+                let category = '其他';
+                
+                if (item.name.includes('肉') || item.name.includes('鸡') || item.name.includes('鸭') || 
+                    item.name.includes('鱼') || item.name.includes('牛') || item.name.includes('猪')) {
+                    category = '肉类';
+                } else if (item.name.includes('菜') || item.name.includes('蔬') || item.name.includes('青') || 
+                          item.name.includes('白') || item.name.includes('萝') || item.name.includes('茄')) {
+                    category = '蔬菜类';
+                } else if (item.name.includes('米') || item.name.includes('面') || item.name.includes('粉') || 
+                          item.name.includes('饭') || item.name.includes('馒') || item.name.includes('包')) {
+                    category = '主食类';
+                } else if (item.name.includes('蛋') || item.name.includes('奶') || item.name.includes('豆') || 
+                          item.name.includes('腐') || item.name.includes('酱') || item.name.includes('油')) {
+                    category = '副食类';
+                } else if (item.name.includes('水') || item.name.includes('果') || item.name.includes('瓜') || 
+                          item.name.includes('苹') || item.name.includes('梨') || item.name.includes('橙')) {
+                    category = '水果类';
+                } else if (item.name.includes('调') || item.name.includes('盐') || item.name.includes('糖') || 
+                          item.name.includes('醋') || item.name.includes('酱') || item.name.includes('油')) {
+                    category = '调味品类';
+                }
+                
+                if (!categorizedIngredients[category]) {
+                    categorizedIngredients[category] = [];
+                }
+                
+                categorizedIngredients[category].push(item);
+            });
+            
+            // 添加CSV内容
+            for (const [category, items] of Object.entries(categorizedIngredients)) {
+                items.forEach(item => {
+                    // 格式化数量
+                    let formattedAmount = item.amount;
+                    let formattedUnit = item.unit;
+                    
+                    if (item.unit === 'g' && item.amount >= 1000) {
+                        formattedAmount = (item.amount / 1000).toFixed(2);
+                        formattedUnit = 'kg';
+                    } else if (item.unit === 'ml' && item.amount >= 1000) {
+                        formattedAmount = (item.amount / 1000).toFixed(2);
+                        formattedUnit = 'L';
+                    } else {
+                        formattedAmount = item.amount.toFixed(2);
+                    }
+                    
+                    csvContent += `${category},${item.name},${formattedAmount},${formattedUnit},"${item.dishes.join(', ')}"\n`;
+                });
+            }
+            
+            // 创建下载链接
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', '采购清单.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 导出菜品数据库为CSV
+        function exportToCSV() {
+            let csvContent = "餐别,菜品类型,食材类别,菜品名称\n";
+            
+            // 遍历所有餐别
+            for (const [category, subCats] of Object.entries(dishDatabase)) {
+                // 遍历每个餐别的子类别
+                for (const [subCat, dishes] of Object.entries(subCats)) {
+                    if (subCat === 'mainMeat') {
+                        // 处理主荤分类
+                        for (const [ingredient, dishList] of Object.entries(dishes)) {
+                            for (const dish of dishList) {
+                                csvContent += `${mealTypeMap[category] || category},${dishTypeMap[subCat] || subCat},${ingredientCategories[ingredient] || ingredient},${dish}\n`;
+                            }
+                        }
+                    } else {
+                        // 处理普通分类
+                        if (Array.isArray(dishes)) {
+                            for (const dish of dishes) {
+                                csvContent += `${mealTypeMap[category] || category},${dishTypeMap[subCat] || subCat},,${dish}\n`;
+                            }
+                        } else {
+                            // 处理可能的主荤数据结构
+                            for (const [ingredient, dishList] of Object.entries(dishes)) {
+                                for (const dish of dishList) {
+                                    csvContent += `${mealTypeMap[category] || category},${dishTypeMap[subCat] || subCat},${ingredientCategories[ingredient] || ingredient},${dish}\n`;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // 创建下载链接
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', '菜品数据库.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 导出菜单为CSV
+        function exportMenuToCSV() {
+            if (!currentMenuData) {
+                alert('请先生成菜单');
+                return;
+            }
+            
+            const dates = getNextWeekDates();
+            let csvContent = "餐别,菜品类型," + dates.join(',') + "\n";
+            
+            // 添加早餐数据
+            csvContent += "早餐,主食," + currentMenuData.breakfast.staple.join(',') + "\n";
+            csvContent += "早餐,热饮," + currentMenuData.breakfast.drink.join(',') + "\n";
+            csvContent += "早餐,蛋类," + currentMenuData.breakfast.egg.join(',') + "\n";
+            csvContent += "早餐,点心1," + currentMenuData.breakfast.dimsum.join(',') + "\n";
+            csvContent += "早餐,点心2," + currentMenuData.breakfast.dimsum2.join(',') + "\n";
+            csvContent += "早餐,素菜," + currentMenuData.breakfast.pickle.join(',') + "\n";
+            csvContent += "早餐,小菜," + currentMenuData.breakfast.pickle2.join(',') + "\n";
+            csvContent += "早餐,杂粮," + currentMenuData.breakfast.grain.join(',') + "\n";
+            
+            // 添加午餐数据
+            csvContent += "午餐,主荤1," + currentMenuData.lunch.mainMeat1.join(',') + "\n";
+            csvContent += "午餐,主荤2," + currentMenuData.lunch.mainMeat2.join(',') + "\n";
+            csvContent += "午餐,次荤1," + currentMenuData.lunch.secondaryMeat1.join(',') + "\n";
+            csvContent += "午餐,次荤2," + currentMenuData.lunch.secondaryMeat2.join(',') + "\n";
+            csvContent += "午餐,面食," + currentMenuData.lunch.noodle.join(',') + "\n";
+            csvContent += "午餐,素菜," + currentMenuData.lunch.vegetable.join(',') + "\n";
+            csvContent += "午餐,主食," + currentMenuData.lunch.staple.join(',') + "\n";
+            csvContent += "午餐,汤类," + currentMenuData.lunch.soup.join(',') + "\n";
+            csvContent += "午餐,水果," + currentMenuData.lunch.fruit.join(',') + "\n";
+            
+            // 添加晚餐数据
+            csvContent += "晚餐,主荤," + currentMenuData.dinner.mainMeat.join(',') + "\n";
+            csvContent += "晚餐,次荤1," + currentMenuData.dinner.secondaryMeat1.join(',') + "\n";
+            csvContent += "晚餐,次荤2," + currentMenuData.dinner.secondaryMeat2.join(',') + "\n";
+            csvContent += "晚餐,素菜," + currentMenuData.dinner.vegetable.join(',') + "\n";
+            csvContent += "晚餐,副食," + currentMenuData.dinner.sideDish.join(',') + "\n";
+            csvContent += "晚餐,主食," + currentMenuData.dinner.staple.join(',') + "\n";
+            csvContent += "晚餐,汤类," + currentMenuData.dinner.soup.join(',') + "\n";
+            
+            // 创建下载链接
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', '下周菜单.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 从CSV导入菜品数据库
+        function importFromCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const lines = content.split('\n');
+                let newDatabase = {
+                    breakfast: {},
+                    lunch: {},
+                    dinner: {}
+                };
+                
+                // 跳过标题行
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    
+                    const [category, subCat, ingredient, dish] = line.split(',');
+                    if (!category || !subCat || !dish) continue;
+                    
+                    // 将中文餐别和菜品类型转换为英文
+                    const engCategory = getKeyByValue(mealTypeMap, category) || category;
+                    const engSubCat = getKeyByValue(dishTypeMap, subCat) || subCat;
+                    const engIngredient = getKeyByValue(ingredientCategories, ingredient) || ingredient;
+                    
+                    // 初始化数据结构
+                    if (!newDatabase[engCategory][engSubCat]) {
+                        newDatabase[engCategory][engSubCat] = engSubCat === 'mainMeat' ? {} : [];
+                    }
+                    
+                    if (engSubCat === 'mainMeat') {
+                        // 处理主荤分类
+                        if (!newDatabase[engCategory][engSubCat][engIngredient]) {
+                            newDatabase[engCategory][engSubCat][engIngredient] = [];
+                        }
+                        newDatabase[engCategory][engSubCat][engIngredient].push(dish);
+                    } else {
+                        // 处理普通分类
+                        if (Array.isArray(newDatabase[engCategory][engSubCat])) {
+                            newDatabase[engCategory][engSubCat].push(dish);
+                        } else {
+                            // 处理可能的主荤数据结构
+                            if (!newDatabase[engCategory][engSubCat][engIngredient]) {
+                                newDatabase[engCategory][engSubCat][engIngredient] = [];
+                            }
+                            newDatabase[engCategory][engSubCat][engIngredient].push(dish);
+                        }
+                    }
+                }
+                
+                // 确认导入
+                if (confirm(`确定要导入 ${lines.length - 1} 条菜品记录吗？这将覆盖现有数据库。`)) {
+                    // 保留默认结构，只更新数据
+                    for (const category in dishDatabase) {
+                        for (const subCat in dishDatabase[category]) {
+                            dishDatabase[category][subCat] = newDatabase[category][subCat] || 
+                                (subCat === 'mainMeat' ? {} : []);
+                        }
+                    }
+                    
+                    saveDatabase();
+                    showDishList();
+                    alert('菜品数据库导入成功！');
+                    
+                    // 更新食材管理标签页的菜品选项
+                    updateIngredientDishOptions();
+                }
+            };
+            reader.readAsText(file);
+            
+            // 重置文件输入，允许重复导入同一文件
+            event.target.value = '';
+        }
+
+        // 导出所有数据
+        function exportAllData() {
+            // 获取就餐人数数据
+            const attendanceData = {
+                monday: {
+                    breakfast: parseInt(document.getElementById('monday-breakfast').value) || 0,
+                    lunch: parseInt(document.getElementById('monday-lunch').value) || 0,
+                    dinner: parseInt(document.getElementById('monday-dinner').value) || 0
+                },
+                tuesday: {
+                    breakfast: parseInt(document.getElementById('tuesday-breakfast').value) || 0,
+                    lunch: parseInt(document.getElementById('tuesday-lunch').value) || 0,
+                    dinner: parseInt(document.getElementById('tuesday-dinner').value) || 0
+                },
+                wednesday: {
+                    breakfast: parseInt(document.getElementById('wednesday-breakfast').value) || 0,
+                    lunch: parseInt(document.getElementById('wednesday-lunch').value) || 0,
+                    dinner: parseInt(document.getElementById('wednesday-dinner').value) || 0
+                },
+                thursday: {
+                    breakfast: parseInt(document.getElementById('thursday-breakfast').value) || 0,
+                    lunch: parseInt(document.getElementById('thursday-lunch').value) || 0,
+                    dinner: parseInt(document.getElementById('thursday-dinner').value) || 0
+                },
+                friday: {
+                    breakfast: parseInt(document.getElementById('friday-breakfast').value) || 0,
+                    lunch: parseInt(document.getElementById('friday-lunch').value) || 0,
+                    dinner: parseInt(document.getElementById('friday-dinner').value) || 0
+                },
+                saturday: {
+                    breakfast: parseInt(document.getElementById('saturday-breakfast').value) || 0,
+                    lunch: parseInt(document.getElementById('saturday-lunch').value) || 0,
+                    dinner: parseInt(document.getElementById('saturday-dinner').value) || 0
+                },
+                sunday: {
+                    breakfast: parseInt(document.getElementById('sunday-breakfast').value) || 0,
+                    lunch: parseInt(document.getElementById('sunday-lunch').value) || 0,
+                    dinner: parseInt(document.getElementById('sunday-dinner').value) || 0
+                }
+            };
+
+            // 准备所有数据
+            const allData = {
+                dishDatabase: dishDatabase,
+                ingredientDatabase: ingredientDatabase,
+                currentMenuData: currentMenuData,
+                attendanceData: attendanceData,
+                version: "1.0",
+                exportDate: new Date().toISOString()
+            };
+
+            // 创建JSON文件
+            const jsonContent = JSON.stringify(allData, null, 2);
+            const blob = new Blob([jsonContent], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', '机关食堂菜单系统数据备份.json');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 导入所有数据
+        function importAllData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const allData = JSON.parse(e.target.result);
+                    
+                    // 验证数据格式
+                    if (!allData.dishDatabase || !allData.ingredientDatabase || !allData.attendanceData) {
+                        throw new Error("文件格式不正确，缺少必要数据");
+                    }
+
+                    if (confirm("确定要导入所有数据吗？这将覆盖当前所有数据！")) {
+                        // 导入菜品数据库 - 合并数据而不是直接替换
+                        for (const category in allData.dishDatabase) {
+                            if (!dishDatabase[category]) dishDatabase[category] = {};
+                            for (const subCategory in allData.dishDatabase[category]) {
+                                dishDatabase[category][subCategory] = allData.dishDatabase[category][subCategory];
+                            }
+                        }
+                        saveDatabase();
+
+                        // 导入食材配方
+                        ingredientDatabase = allData.ingredientDatabase;
+                        localStorage.setItem('ingredientDatabase', JSON.stringify(ingredientDatabase));
+
+                        // 导入菜单数据
+                        if (allData.currentMenuData) {
+                            currentMenuData = allData.currentMenuData;
+                            localStorage.setItem('savedMenuData', JSON.stringify(currentMenuData));
+                            renderMenu();
+                        }
+
+                        // 导入就餐人数
+                        const attendanceData = allData.attendanceData;
+                        localStorage.setItem('attendanceData', JSON.stringify(attendanceData));
+                        for (const day in attendanceData) {
+                            for (const meal in attendanceData[day]) {
+                                const element = document.getElementById(`${day}-${meal}`);
+                                if (element) {
+                                    element.value = attendanceData[day][meal];
+                                }
+                            }
+                        }
+
+                        // 刷新显示
+                        updateSubCategoryOptions();
+                        showDishList();
+                        updateIngredientSubCategoryOptions();
+                        updateIngredientDishOptions();
+                        
+                        alert('数据导入成功！');
+                    }
+                } catch (error) {
+                    alert('导入失败: ' + error.message);
+                    console.error(error);
+                }
+            };
+            reader.readAsText(file);
+
+            // 重置文件输入，允许重复导入同一文件
+            event.target.value = '';
+        }
+
+        // 从指定类别中选择菜品，确保食材间隔
+        function getDishWithSpacing(category, subCategory, dayIndex) {
+            if (subCategory !== 'mainMeat' || typeof dishDatabase[category][subCategory] !== 'object') {
+                // 非主荤菜品，使用原有逻辑
+                const availableDishes = Array.isArray(dishDatabase[category][subCategory]) ? 
+                    dishDatabase[category][subCategory] : 
+                    Object.values(dishDatabase[category][subCategory]).flat();
+                
+                const filteredDishes = availableDishes.filter(dish => !usedDishes.has(dish));
+                
+                if (filteredDishes.length === 0) {
+                    return "暂无菜品";
+                }
+                
+                const randomIndex = Math.floor(Math.random() * filteredDishes.length);
+                const selectedDish = filteredDishes[randomIndex];
+                usedDishes.add(selectedDish);
+                return selectedDish;
+            }
+            
+            // 主荤菜品智能选择逻辑
+            const availableIngredients = Object.keys(dishDatabase[category][subCategory]);
+            if (availableIngredients.length === 0) {
+                return "暂无菜品";
+            }
+            
+            // 获取最近两天使用的食材类别
+            const recentlyUsed = recentlyUsedIngredients.slice(-2);
+            
+            // 找出可用的食材类别（不在最近两天使用的）
+            const availableIng = availableIngredients.filter(
+                ing => !recentlyUsed.includes(ing)
+            );
+            
+            let selectedIng;
+            if (availableIng.length > 0) {
+                // 有可用的食材类别
+                selectedIng = availableIng[Math.floor(Math.random() * availableIng.length)];
+            } else {
+                // 所有类别最近两天都用过，随机选择一个
+                selectedIng = availableIngredients[Math.floor(Math.random() * availableIngredients.length)];
+            }
+            
+            // 记录使用的食材类别
+            recentlyUsedIngredients.push(selectedIng);
+            
+            // 从该类别中选择菜品
+            const dishes = dishDatabase[category][subCategory][selectedIng].filter(
+                dish => !usedDishes.has(dish)
+            );
+            
+            if (dishes.length === 0) {
+                return "暂无菜品";
+            }
+            
+            const selectedDish = dishes[Math.floor(Math.random() * dishes.length)];
+            usedDishes.add(selectedDish);
+            return selectedDish;
+        }
+
+        // 保存数据库到本地存储
+        function saveDatabase() {
+            localStorage.setItem('dishDatabase', JSON.stringify(dishDatabase));
+        }
+
+        // 从本地存储加载数据库
+        function loadDatabase() {
+            const savedDatabase = localStorage.getItem('dishDatabase');
+            if (savedDatabase) {
+                const parsed = JSON.parse(savedDatabase);
+                
+                // 合并保存的数据与默认结构
+                for (const category in parsed) {
+                    if (!dishDatabase[category]) dishDatabase[category] = {};
+                    for (const subCategory in parsed[category]) {
+                        dishDatabase[category][subCategory] = parsed[category][subCategory];
+                    }
+                }
+                
+                // 确保所有必需的类别都存在
+                const requiredCategories = {
+                    breakfast: ['staple', 'drink', 'egg', 'dimsum', 'dimsum2', 'pickle', 'pickle2', 'grain'],
+                    lunch: ['mainMeat', 'secondaryMeat', 'noodle', 'vegetable', 'staple', 'soup', 'fruit'],
+                    dinner: ['mainMeat', 'secondaryMeat', 'vegetable', 'sideDish', 'staple', 'soup']
+                };
+                
+                for (const category in requiredCategories) {
+                    if (!dishDatabase[category]) dishDatabase[category] = {};
+                    requiredCategories[category].forEach(subCat => {
+                        if (!dishDatabase[category][subCat]) {
+                            dishDatabase[category][subCat] = subCat === 'mainMeat' ? {} : [];
+                        }
+                    });
+                }
+            }
+        }
+
+        // 生成菜单
+        function generateMenu() {
+            // 重置已使用的菜品记录
+            usedDishes = new Set();
+            recentlyUsedIngredients = [];
+            
+            // 获取下周日期
+            const nextWeekDates = getNextWeekDates();
+            updateDateInfo();
+            
+            // 存储生成的菜单数据
+            currentMenuData = {
+                breakfast: {
+                    staple: [],
+                    drink: [],
+                    egg: [],
+                    dimsum: [],
+                    dimsum2: [],
+                    pickle: [],
+                    pickle2: [],
+                    grain: []
+                },
+                lunch: {
+                    mainMeat1: [],
+                    mainMeat2: [],
+                    secondaryMeat1: [],
+                    secondaryMeat2: [],
+                    noodle: [],
+                    vegetable: [],
+                    staple: [],
+                    soup: [],
+                    fruit: []
+                },
+                dinner: {
+                    mainMeat: [],
+                    secondaryMeat1: [],
+                    secondaryMeat2: [],
+                    vegetable: [],
+                    sideDish: [],
+                    staple: [],
+                    soup: []
+                }
+            };
+            
+            // 生成早餐菜单
+            for (let i = 0; i < 7; i++) {
+                currentMenuData.breakfast.staple.push(getDishWithSpacing('breakfast', 'staple', i));
+                currentMenuData.breakfast.drink.push(getDishWithSpacing('breakfast', 'drink', i));
+                currentMenuData.breakfast.egg.push(getDishWithSpacing('breakfast', 'egg', i));
+                currentMenuData.breakfast.dimsum.push(getDishWithSpacing('breakfast', 'dimsum', i));
+                currentMenuData.breakfast.dimsum2.push(getDishWithSpacing('breakfast', 'dimsum2', i));
+                currentMenuData.breakfast.pickle.push(getDishWithSpacing('breakfast', 'pickle', i));
+                currentMenuData.breakfast.pickle2.push(getDishWithSpacing('breakfast', 'pickle2', i));
+                currentMenuData.breakfast.grain.push(getDishWithSpacing('breakfast', 'grain', i));
+            }
+            
+            // 生成午餐菜单
+            for (let i = 0; i < 7; i++) {
+                currentMenuData.lunch.mainMeat1.push(getDishWithSpacing('lunch', 'mainMeat', i));
+                currentMenuData.lunch.mainMeat2.push(getDishWithSpacing('lunch', 'mainMeat', i));
+                currentMenuData.lunch.secondaryMeat1.push(getDishWithSpacing('lunch', 'secondaryMeat', i));
+                currentMenuData.lunch.secondaryMeat2.push(getDishWithSpacing('lunch', 'secondaryMeat', i));
+                currentMenuData.lunch.noodle.push(getDishWithSpacing('lunch', 'noodle', i));
+                currentMenuData.lunch.vegetable.push(getDishWithSpacing('lunch', 'vegetable', i));
+                currentMenuData.lunch.staple.push(getDishWithSpacing('lunch', 'staple', i));
+                currentMenuData.lunch.soup.push(getDishWithSpacing('lunch', 'soup', i));
+                currentMenuData.lunch.fruit.push(getDishWithSpacing('lunch', 'fruit', i));
+            }
+            
+            // 生成晚餐菜单
+            for (let i = 0; i < 7; i++) {
+                currentMenuData.dinner.mainMeat.push(getDishWithSpacing('dinner', 'mainMeat', i));
+                currentMenuData.dinner.secondaryMeat1.push(getDishWithSpacing('dinner', 'secondaryMeat', i));
+                currentMenuData.dinner.secondaryMeat2.push(getDishWithSpacing('dinner', 'secondaryMeat', i));
+                currentMenuData.dinner.vegetable.push(getDishWithSpacing('dinner', 'vegetable', i));
+                currentMenuData.dinner.sideDish.push(getDishWithSpacing('dinner', 'sideDish', i));
+                currentMenuData.dinner.staple.push(getDishWithSpacing('dinner', 'staple', i));
+                currentMenuData.dinner.soup.push(getDishWithSpacing('dinner', 'soup', i));
+            }
+            
+            // 渲染菜单
+            renderMenu();
+        }
+
+        // 渲染菜单
+        function renderMenu() {
+            if (!currentMenuData) return;
+            
+            const nextWeekDates = getNextWeekDates();
+            let menuHTML = `
+                <table>
+                    <tr>
+                        <th colspan="8">机关食堂周菜单</th>
+                    </tr>
+                    <tr>
+                        <th>日期</th>
+                        ${nextWeekDates.map(date => `<td>${date}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <th>周期</th>
+                        <td>星期一</td>
+                        <td>星期二</td>
+                        <td>星期三</td>
+                        <td>星期四</td>
+                        <td>星期五</td>
+                        <td>星期六</td>
+                        <td>星期日</td>
+                    </tr>
+            `;
+            
+            // 早餐部分
+            menuHTML += `
+                    <tr>
+                        <th>早餐</th>
+                        <td colspan="7"></td>
+                    </tr>
+                    <tr class="category">
+                        <th>餐别</th>
+                        <th>星期一</th>
+                        <th>星期二</th>
+                        <th>星期三</th>
+                        <th>星期四</th>
+                        <th>星期五</th>
+                        <th>星期六</th>
+                        <th>星期日</th>
+                    </tr>
+                    
+                    <!-- 早餐主食 -->
+                    <tr>
+                        <td>主食</td>
+                        ${currentMenuData.breakfast.staple.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('breakfast', 'staple', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 早餐热饮 -->
+                    <tr>
+                        <td>热饮</td>
+                        ${currentMenuData.breakfast.drink.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('breakfast', 'drink', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 早餐蛋类 -->
+                    <tr>
+                        <td>蛋类</td>
+                        ${currentMenuData.breakfast.egg.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('breakfast', 'egg', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 早餐点心1 -->
+                    <tr>
+                        <td>点心1</td>
+                        ${currentMenuData.breakfast.dimsum.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('breakfast', 'dimsum', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 早餐点心2 -->
+                    <tr>
+                        <td>点心2</td>
+                        ${currentMenuData.breakfast.dimsum2.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('breakfast', 'dimsum2', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 早餐素菜 -->
+                    <tr>
+                        <td>素菜</td>
+                        ${currentMenuData.breakfast.pickle.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('breakfast', 'pickle', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 早餐小菜 -->
+                    <tr>
+                        <td>小菜</td>
+                        ${currentMenuData.breakfast.pickle2.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('breakfast', 'pickle2', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 早餐杂粮 -->
+                    <tr>
+                        <td>杂粮</td>
+                        ${currentMenuData.breakfast.grain.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('breakfast', 'grain', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 午餐部分 -->
+                    <tr>
+                        <th>午餐</th>
+                        <td colspan="7"></td>
+                    </tr>
+                    <tr class="category">
+                        <th>餐别</th>
+                        <th>星期一</th>
+                        <th>星期二</th>
+                        <th>星期三</th>
+                        <th>星期四</th>
+                        <th>星期五</th>
+                        <th>星期六</th>
+                        <th>星期日</th>
+                    </tr>
+                    
+                    <!-- 午餐主荤1 -->
+                    <tr>
+                        <td>主荤1</td>
+                        ${currentMenuData.lunch.mainMeat1.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('lunch', 'mainMeat1', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 午餐主荤2 -->
+                    <tr>
+                        <td>主荤2</td>
+                        ${currentMenuData.lunch.mainMeat2.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('lunch', 'mainMeat2', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 午餐次荤1 -->
+                    <tr>
+                        <td>次荤1</td>
+                        ${currentMenuData.lunch.secondaryMeat1.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('lunch', 'secondaryMeat1', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 午餐次荤2 -->
+                    <tr>
+                        <td>次荤2</td>
+                        ${currentMenuData.lunch.secondaryMeat2.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('lunch', 'secondaryMeat2', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 午餐面食 -->
+                    <tr>
+                        <td>面食</td>
+                        ${currentMenuData.lunch.noodle.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('lunch', 'noodle', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 午餐素菜 -->
+                    <tr>
+                        <td>素菜</td>
+                        ${currentMenuData.lunch.vegetable.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('lunch', 'vegetable', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 午餐主食 -->
+                    <tr>
+                        <td>主食</td>
+                        ${currentMenuData.lunch.staple.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('lunch', 'staple', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 午餐汤类 -->
+                    <tr>
+                        <td>汤类</td>
+                        ${currentMenuData.lunch.soup.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('lunch', 'soup', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 午餐水果 -->
+                    <tr>
+                        <td>水果</td>
+                        ${currentMenuData.lunch.fruit.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('lunch', 'fruit', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 晚餐部分 -->
+                    <tr>
+                        <th>晚餐</th>
+                        <td colspan="7"></td>
+                    </tr>
+                    <tr class="category">
+                        <th>餐别</th>
+                        <th>星期一</th>
+                        <th>星期二</th>
+                        <th>星期三</th>
+                        <th>星期四</th>
+                        <th>星期五</th>
+                        <th>星期六</th>
+                        <th>星期日</th>
+                    </tr>
+                    
+                    <!-- 晚餐主荤 -->
+                    <tr>
+                        <td>主荤</td>
+                        ${currentMenuData.dinner.mainMeat.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('dinner', 'mainMeat', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 晚餐次荤1 -->
+                    <tr>
+                        <td>次荤1</td>
+                        ${currentMenuData.dinner.secondaryMeat1.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('dinner', 'secondaryMeat1', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 晚餐次荤2 -->
+                    <tr>
+                        <td>次荤2</td>
+                        ${currentMenuData.dinner.secondaryMeat2.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('dinner', 'secondaryMeat2', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 晚餐素菜 -->
+                    <tr>
+                        <td>素菜</td>
+                        ${currentMenuData.dinner.vegetable.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('dinner', 'vegetable', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 晚餐副食 -->
+                    <tr>
+                        <td>副食</td>
+                        ${currentMenuData.dinner.sideDish.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('dinner', 'sideDish', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 晚餐主食 -->
+                    <tr>
+                        <td>主食</td>
+                        ${currentMenuData.dinner.staple.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('dinner', 'staple', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                    
+                    <!-- 晚餐汤类 -->
+                    <tr>
+                        <td>汤类</td>
+                        ${currentMenuData.dinner.soup.map((dish, index) => `<td class="editable-dish" onclick="showEditDishModal('dinner', 'soup', ${index})">${dish}</td>`).join('')}
+                    </tr>
+                </table>
+            `;
+            
+            document.getElementById('menu-container').innerHTML = menuHTML;
+        }
+
+        // 显示编辑菜品模态框
+        function showEditDishModal(mealType, dishType, dayIndex) {
+            currentEditingDish = {
+                mealType: mealType,
+                dishType: dishType,
+                dayIndex: dayIndex
+            };
+            
+            // 设置模态框中的值
+            document.getElementById('edit-meal-type').value = mealType;
+            document.getElementById('edit-day').value = dayIndex;
+            
+            // 更新菜品类型下拉框
+            const dishTypeSelect = document.getElementById('edit-dish-type');
+            dishTypeSelect.innerHTML = '';
+            
+            // 添加选项
+            const option = document.createElement('option');
+            option.value = dishType;
+            option.textContent = dishTypeMap[dishType] || dishType;
+            dishTypeSelect.appendChild(option);
+            
+            // 更新菜品名称下拉框
+            updateDishNameOptions(mealType, dishType);
+            
+            // 显示模态框
+            document.getElementById('dish-edit-modal').style.display = 'block';
+        }
+
+        // 更新菜品名称下拉框
+        function updateDishNameOptions(mealType, dishType) {
+            const dishNameSelect = document.getElementById('edit-dish-name');
+            dishNameSelect.innerHTML = '';
+            
+            // 获取当前菜品类型的所有菜品
+            let dishes = [];
+            
+            if (dishType === 'mainMeat1' || dishType === 'mainMeat2') {
+                // 午餐主荤
+                dishes = Object.values(dishDatabase.lunch.mainMeat).flat();
+            } else if (dishType === 'secondaryMeat1' || dishType === 'secondaryMeat2') {
+                // 午餐次荤
+                dishes = dishDatabase.lunch.secondaryMeat;
+            } else if (mealType === 'dinner' && (dishType === 'secondaryMeat1' || dishType === 'secondaryMeat2')) {
+                // 晚餐次荤
+                dishes = dishDatabase.dinner.secondaryMeat;
+            } else {
+                // 其他情况
+                dishes = Array.isArray(dishDatabase[mealType][dishType]) ? 
+                    dishDatabase[mealType][dishType] : 
+                    Object.values(dishDatabase[mealType][dishType]).flat();
+            }
+            
+            // 添加选项
+            dishes.forEach(dish => {
+                const option = document.createElement('option');
+                option.value = dish;
+                option.textContent = dish;
+                dishNameSelect.appendChild(option);
+            });
+            
+            // 设置当前选中的菜品
+            const currentDish = currentMenuData[mealType][dishType][currentEditingDish.dayIndex];
+            dishNameSelect.value = currentDish;
+        }
+
+        // 关闭编辑菜品模态框
+        function closeDishEditModal() {
+            document.getElementById('dish-edit-modal').style.display = 'none';
+        }
+
+        // 保存菜品编辑
+        function saveDishEdit() {
+            const newDish = document.getElementById('edit-dish-name').value;
+            const { mealType, dishType, dayIndex } = currentEditingDish;
+            
+            // 更新菜单数据
+            currentMenuData[mealType][dishType][dayIndex] = newDish;
+            
+            // 重新渲染菜单
+            renderMenu();
+            
+            // 关闭模态框
+            closeDishEditModal();
+            
+            // 保存菜单数据
+            localStorage.setItem('savedMenuData', JSON.stringify(currentMenuData));
+        }
+
+        // 保存菜单
+        function saveMenu() {
+            // 保存HTML内容
+            const menuContent = document.getElementById('menu-container').innerHTML;
+            localStorage.setItem('savedMenu', menuContent);
+            
+            // 保存菜单数据
+            localStorage.setItem('savedMenuData', JSON.stringify(currentMenuData));
+            
+            alert('菜单已保存');
+        }
+
+        // 获取下周日期
+        function getNextWeekDates() {
+            const dates = [];
+            const today = new Date();
+            const nextMonday = new Date(today);
+            
+            // 计算下周一的日期
+            const daysUntilNextMonday = (7 - today.getDay() + 1) % 7;
+            nextMonday.setDate(today.getDate() + (daysUntilNextMonday === 0 ? 7 : daysUntilNextMonday));
+            
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(nextMonday);
+                date.setDate(nextMonday.getDate() + i);
+                dates.push(`${date.getMonth() + 1}月${date.getDate()}日`);
+            }
+            
+            return dates;
+        }
+
+        // 打印菜单
+        function printMenu() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
